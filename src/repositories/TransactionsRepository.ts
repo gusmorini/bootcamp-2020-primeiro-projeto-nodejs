@@ -17,20 +17,38 @@ interface CreateTransactionDTO {
 class TransactionsRepository {
   private transactions: Transaction[];
 
-  private balance: Balance[];
-
   constructor() {
     this.transactions = [];
   }
 
-  // this.balance = {};
-
   public all(): Transaction[] {
-    return this.transactions;
+    const { transactions } = this;
+
+    return transactions;
   }
 
   public getBalance(): Balance {
-    // TODO
+    const { transactions } = this;
+
+    const income = transactions.reduce((total, item) => {
+      if (item.type === 'income') {
+        return (total += item.value);
+      }
+      return total;
+    }, 0);
+
+    const outcome = transactions.reduce((total, item) => {
+      if (item.type === 'outcome') {
+        return (total += item.value);
+      }
+      return total;
+    }, 0);
+
+    const total = income - outcome;
+
+    const balance = { income, outcome, total };
+
+    return balance;
   }
 
   public create({ title, value, type }: CreateTransactionDTO): Transaction {

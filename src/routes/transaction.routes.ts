@@ -1,22 +1,17 @@
 import { Router } from 'express';
 
-// import Transactions from '../models/Transaction';
-
 import TransactionsRepository from '../repositories/TransactionsRepository';
-// import CreateTransactionService from '../services/CreateTransactionService';
+import CreateTransactionService from '../services/CreateTransactionService';
 
 const transactionRouter = Router();
 
 const transactionsRepository = new TransactionsRepository();
 
-// testes
-
-// const transactions: Transactions[] = [];
-
 transactionRouter.get('/', (request, response) => {
   try {
     const transactions = transactionsRepository.all();
-    return response.json(transactions);
+    const balance = transactionsRepository.getBalance();
+    return response.json({ transactions, balance });
   } catch (err) {
     return response.status(400).json({ error: err.message });
   }
@@ -26,17 +21,12 @@ transactionRouter.post('/', (request, response) => {
   try {
     const { title, value, type } = request.body;
 
-    const transaction = transactionsRepository.create({
-      title,
-      value,
-      type,
-    });
+    const createTransaction = new CreateTransactionService(
+      transactionsRepository,
+    );
 
-    // transactions.push(transaction);
-
+    const transaction = createTransaction.execute({ title, value, type });
     return response.json(transaction);
-
-    // TODO
   } catch (err) {
     return response.status(400).json({ error: err.message });
   }
