@@ -17,10 +17,10 @@ class CreateTransactionService {
   }
 
   public execute({ title, value, type }: Request): Transaction {
-    const balance = this.transactionsRepository.getBalance();
+    const { total } = this.transactionsRepository.getBalance();
 
-    if (type === 'outcome' && value > balance.total) {
-      throw Error('Saldo insulficiente');
+    if (type === 'outcome' && value > total) {
+      throw Error('Your balance is insufficient');
     }
 
     const transaction = this.transactionsRepository.create({
