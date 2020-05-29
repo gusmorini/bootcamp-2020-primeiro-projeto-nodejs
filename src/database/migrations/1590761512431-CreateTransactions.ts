@@ -28,11 +28,6 @@ export default class CreateTransactions1590761512431
             type: 'varchar',
             isNullable: false,
           },
-          {
-            name: 'date',
-            type: 'timestamp with time zone',
-            isNullable: false,
-          },
         ],
       }),
     );
