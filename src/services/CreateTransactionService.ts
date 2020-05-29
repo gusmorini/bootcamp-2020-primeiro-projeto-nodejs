@@ -20,9 +20,9 @@ class CreateTransactionService {
   public async execute({ title, value, type }: Request): Promise<Transaction> {
     const transactionsRepository = getCustomRepository(TransactionsRepository);
 
-    const { total } = transactionsRepository.getBalance();
+    const { total } = await transactionsRepository.getBalance();
 
-    if (type === 'outcome' && value > total) {
+    if (type === 'outcome' && value > Number(total)) {
       throw Error('Your balance is insufficient');
     }
 

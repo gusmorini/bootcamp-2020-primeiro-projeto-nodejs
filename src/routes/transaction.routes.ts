@@ -8,12 +8,12 @@ const transactionRouter = Router();
 
 // const transactionsRepository = new TransactionsRepository();
 
-transactionRouter.get('/', (request, response) => {
+transactionRouter.get('/', async (request, response) => {
   try {
     const transactionsRepository = getCustomRepository(TransactionsRepository);
     // const transactions = transactionsRepository.all();
-    const transactions = transactionsRepository.find();
-    const balance = transactionsRepository.getBalance();
+    const transactions = await transactionsRepository.find();
+    const balance = await transactionsRepository.getBalance();
     return response.json({ transactions, balance });
   } catch (err) {
     return response.status(400).json({ error: err.message });

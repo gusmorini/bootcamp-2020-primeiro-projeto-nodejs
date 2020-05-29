@@ -12,6 +12,7 @@ export default class CreateTransactions1590761512431
             type: 'varchar',
             isPrimary: true,
             generationStrategy: 'uuid',
+            default: 'uuid_generate_v4()',
           },
           {
             name: 'title',
