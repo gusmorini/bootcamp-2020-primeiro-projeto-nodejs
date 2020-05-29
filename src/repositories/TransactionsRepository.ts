@@ -1,3 +1,4 @@
+import { EntityRepository, Repository } from 'typeorm';
 import Transaction from '../models/Transaction';
 
 interface Balance {
@@ -8,27 +9,26 @@ interface Balance {
 
 // Data transfer Object
 
-interface CreateTransactionDTO {
-  title: string;
-  value: number;
-  type: 'income' | 'outcome';
-}
+// interface CreateTransactionDTO {
+//   title: string;
+//   value: number;
+//   type: 'income' | 'outcome';
+// }
 
-class TransactionsRepository {
-  private transactions: Transaction[];
+@EntityRepository(Transaction)
+class TransactionsRepository extends Repository<Transaction> {
+  // private transactions: Transaction[];
+  // constructor() {
+  //   this.transactions = [];
+  // }
+  // public all(): Transaction[] {
+  //   const { transactions } = this;
+  //   return transactions;
+  // }
 
-  constructor() {
-    this.transactions = [];
-  }
-
-  public all(): Transaction[] {
-    const { transactions } = this;
-
-    return transactions;
-  }
-
-  public getBalance(): Balance {
-    const { income, outcome } = this.transactions.reduce(
+  public async getBalance(): Promise<Balance> {
+    const transactions = await this.find();
+    const { income, outcome } = transactions.reduce(
       (accumulator: Omit<Balance, 'total'>, transaction: Transaction) => {
         switch (transaction.type) {
           case 'income':
@@ -56,13 +56,11 @@ class TransactionsRepository {
     return { income, outcome, total };
   }
 
-  public create({ title, value, type }: CreateTransactionDTO): Transaction {
-    const transaction = new Transaction({ title, value, type });
-
-    this.transactions.push(transaction);
-
-    return transaction;
-  }
+  // public create({ title, value, type }: CreateTransactionDTO): Transaction {
+  //   const transaction = new Transaction({ title, value, type });
+  //   this.transactions.push(transaction);
+  //   return transaction;
+  // }
 }
 
 export default TransactionsRepository;
