@@ -1,4 +1,3 @@
-import { getCustomRepository } from 'typeorm';
 import TransactionsRepository from '../repositories/TransactionsRepository';
 import Transaction from '../models/Transaction';
 
@@ -11,28 +10,24 @@ interface Request {
 }
 
 class CreateTransactionService {
-  // private transactionsRepository: TransactionsRepository;
+  private transactionsRepository: TransactionsRepository;
 
-  // constructor(transactionsRepository: TransactionsRepository) {
-  //   this.transactionsRepository = transactionsRepository;
-  // }
+  constructor(transactionsRepository: TransactionsRepository) {
+    this.transactionsRepository = transactionsRepository;
+  }
 
-  public async execute({ title, value, type }: Request): Promise<Transaction> {
-    const transactionsRepository = getCustomRepository(TransactionsRepository);
+  public execute({ title, value, type }: Request): Transaction {
+    const { total } = this.transactionsRepository.getBalance();
 
-    const { total } = await transactionsRepository.getBalance();
-
-    if (type === 'outcome' && value > Number(total)) {
+    if (type === 'outcome' && value > total) {
       throw Error('Your balance is insufficient');
     }
 
-    const transaction = transactionsRepository.create({
+    const transaction = this.transactionsRepository.create({
       title,
       value,
       type,
     });
-
-    await transactionsRepository.save(transaction);
 
     return transaction;
   }

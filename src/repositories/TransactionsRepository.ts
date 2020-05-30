@@ -1,4 +1,3 @@
-import { EntityRepository, Repository } from 'typeorm';
 import Transaction from '../models/Transaction';
 
 interface Balance {
@@ -9,34 +8,35 @@ interface Balance {
 
 // Data transfer Object
 
-// interface CreateTransactionDTO {
-//   title: string;
-//   value: number;
-//   type: 'income' | 'outcome';
-// }
+interface CreateTransactionDTO {
+  title: string;
+  value: number;
+  type: 'income' | 'outcome';
+}
 
-@EntityRepository(Transaction)
-class TransactionsRepository extends Repository<Transaction> {
-  // private transactions: Transaction[];
-  // constructor() {
-  //   this.transactions = [];
-  // }
-  // public all(): Transaction[] {
-  //   const { transactions } = this;
-  //   return transactions;
-  // }
+class TransactionsRepository {
+  private transactions: Transaction[];
 
-  public async getBalance(): Promise<Balance> {
-    const transactions = await this.find();
-    const { income, outcome } = transactions.reduce(
+  constructor() {
+    this.transactions = [];
+  }
+
+  public all(): Transaction[] {
+    const { transactions } = this;
+
+    return transactions;
+  }
+
+  public getBalance(): Balance {
+    const { income, outcome } = this.transactions.reduce(
       (accumulator: Omit<Balance, 'total'>, transaction: Transaction) => {
         switch (transaction.type) {
           case 'income':
-            accumulator.income += Number(transaction.value);
+            accumulator.income += transaction.value;
             break;
 
           case 'outcome':
-            accumulator.outcome += Number(transaction.value);
+            accumulator.outcome += transaction.value;
             break;
 
           default:
@@ -56,11 +56,13 @@ class TransactionsRepository extends Repository<Transaction> {
     return { income, outcome, total };
   }
 
-  // public create({ title, value, type }: CreateTransactionDTO): Transaction {
-  //   const transaction = new Transaction({ title, value, type });
-  //   this.transactions.push(transaction);
-  //   return transaction;
-  // }
+  public create({ title, value, type }: CreateTransactionDTO): Transaction {
+    const transaction = new Transaction({ title, value, type });
+
+    this.transactions.push(transaction);
+
+    return transaction;
+  }
 }
 
 export default TransactionsRepository;

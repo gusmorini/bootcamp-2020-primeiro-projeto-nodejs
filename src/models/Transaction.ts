@@ -1,30 +1,20 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { uuid } from 'uuidv4';
 
-@Entity('transactions')
 class Transaction {
-  @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
   title: string;
 
-  @Column('numeric')
   value: number;
 
-  @Column()
   type: 'income' | 'outcome';
 
-  @CreateDateColumn()
-  created_at: Date;
-
-  @UpdateDateColumn()
-  updated_at: Date;
+  constructor({ title, value, type }: Omit<Transaction, 'id'>) {
+    this.id = uuid();
+    this.title = title;
+    this.value = value;
+    this.type = type;
+  }
 }
 
 export default Transaction;
