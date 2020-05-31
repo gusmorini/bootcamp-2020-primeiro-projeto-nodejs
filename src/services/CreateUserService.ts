@@ -1,4 +1,5 @@
 import { getRepository } from 'typeorm';
+import { hash } from 'bcryptjs';
 import User from '../models/User';
 
 interface Request {
@@ -10,6 +11,8 @@ interface Request {
 export default class CreateUserService {
   public async execute({ name, email, password }: Request): Promise<User> {
     const userRepository = getRepository(User);
+
+    const hashPassword = await hash(password, 8);
 
     // busca informações no banco
     const checkUserExists = await userRepository.findOne({
@@ -25,7 +28,7 @@ export default class CreateUserService {
     const user = userRepository.create({
       name,
       email,
-      password,
+      password: hashPassword,
     });
 
     // salva a instância no banco
