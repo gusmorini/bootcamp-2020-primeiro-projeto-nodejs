@@ -8,19 +8,19 @@ interface Request {
   title: string;
   value: number;
   type: 'income' | 'outcome';
+  user_id: string;
 }
 
 class CreateTransactionService {
-  // private transactionsRepository: TransactionsRepository;
-
-  // constructor(transactionsRepository: TransactionsRepository) {
-  //   this.transactionsRepository = transactionsRepository;
-  // }
-
-  public async execute({ title, value, type }: Request): Promise<Transaction> {
+  public async execute({
+    title,
+    value,
+    type,
+    user_id,
+  }: Request): Promise<Transaction> {
     const transactionsRepository = getCustomRepository(TransactionsRepository);
 
-    const { total } = await transactionsRepository.getBalance();
+    const { total } = await transactionsRepository.getBalance(user_id);
 
     if (type === 'outcome' && value > Number(total)) {
       throw Error('Your balance is insufficient');
@@ -30,6 +30,7 @@ class CreateTransactionService {
       title,
       value,
       type,
+      user_id,
     });
 
     await transactionsRepository.save(transaction);

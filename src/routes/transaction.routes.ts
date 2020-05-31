@@ -6,14 +6,14 @@ import CreateTransactionService from '../services/CreateTransactionService';
 
 const transactionRouter = Router();
 
-// const transactionsRepository = new TransactionsRepository();
-
-transactionRouter.get('/', async (request, response) => {
+transactionRouter.get('/:id', async (request, response) => {
   try {
+    const { id } = request.params;
     const transactionsRepository = getCustomRepository(TransactionsRepository);
-    // const transactions = transactionsRepository.all();
-    const transactions = await transactionsRepository.find();
-    const balance = await transactionsRepository.getBalance();
+    const transactions = await transactionsRepository.find({
+      where: { user_id: id },
+    });
+    const balance = await transactionsRepository.getBalance(id);
     return response.json({ transactions, balance });
   } catch (err) {
     return response.status(400).json({ error: err.message });
@@ -22,15 +22,16 @@ transactionRouter.get('/', async (request, response) => {
 
 transactionRouter.post('/', async (request, response) => {
   try {
-    const { title, value, type } = request.body;
-
-    // const createTransaction = new CreateTransactionService(
-    //   transactionsRepository,
-    // );
+    const { title, value, type, user_id } = request.body;
 
     const createTransaction = new CreateTransactionService();
 
-    const transaction = await createTransaction.execute({ title, value, type });
+    const transaction = await createTransaction.execute({
+      title,
+      value,
+      type,
+      user_id,
+    });
     return response.json(transaction);
   } catch (err) {
     return response.status(400).json({ error: err.message });

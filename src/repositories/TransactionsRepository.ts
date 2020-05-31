@@ -7,27 +7,10 @@ interface Balance {
   total: number;
 }
 
-// Data transfer Object
-
-// interface CreateTransactionDTO {
-//   title: string;
-//   value: number;
-//   type: 'income' | 'outcome';
-// }
-
 @EntityRepository(Transaction)
 class TransactionsRepository extends Repository<Transaction> {
-  // private transactions: Transaction[];
-  // constructor() {
-  //   this.transactions = [];
-  // }
-  // public all(): Transaction[] {
-  //   const { transactions } = this;
-  //   return transactions;
-  // }
-
-  public async getBalance(): Promise<Balance> {
-    const transactions = await this.find();
+  public async getBalance(user_id: string): Promise<Balance> {
+    const transactions = await this.find({ where: { user_id } });
     const { income, outcome } = transactions.reduce(
       (accumulator: Omit<Balance, 'total'>, transaction: Transaction) => {
         switch (transaction.type) {
@@ -55,12 +38,6 @@ class TransactionsRepository extends Repository<Transaction> {
 
     return { income, outcome, total };
   }
-
-  // public create({ title, value, type }: CreateTransactionDTO): Transaction {
-  //   const transaction = new Transaction({ title, value, type });
-  //   this.transactions.push(transaction);
-  //   return transaction;
-  // }
 }
 
 export default TransactionsRepository;
