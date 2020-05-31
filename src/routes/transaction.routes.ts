@@ -4,11 +4,16 @@ import { getCustomRepository, TransactionRepository } from 'typeorm';
 import TransactionsRepository from '../repositories/TransactionsRepository';
 import CreateTransactionService from '../services/CreateTransactionService';
 
+import ensureAuthenticated from '../middlewares/ensureAuthenticated';
+
 const transactionRouter = Router();
 
-transactionRouter.get('/:id', async (request, response) => {
+// middleware
+transactionRouter.use(ensureAuthenticated);
+
+transactionRouter.get('/', async (request, response) => {
   try {
-    const { id } = request.params;
+    const { id } = request.user;
     const transactionsRepository = getCustomRepository(TransactionsRepository);
     const transactions = await transactionsRepository.find({
       where: { user_id: id },
@@ -22,7 +27,9 @@ transactionRouter.get('/:id', async (request, response) => {
 
 transactionRouter.post('/', async (request, response) => {
   try {
-    const { title, value, type, user_id } = request.body;
+    const { id } = request.user;
+
+    const { title, value, type } = request.body;
 
     const createTransaction = new CreateTransactionService();
 
@@ -30,7 +37,7 @@ transactionRouter.post('/', async (request, response) => {
       title,
       value,
       type,
-      user_id,
+      user_id: id,
     });
     return response.json(transaction);
   } catch (err) {
