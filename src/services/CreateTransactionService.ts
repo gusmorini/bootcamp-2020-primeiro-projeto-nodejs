@@ -2,6 +2,8 @@ import { getCustomRepository } from 'typeorm';
 import TransactionsRepository from '../repositories/TransactionsRepository';
 import Transaction from '../models/Transaction';
 
+import AppError from '../errors/AppError';
+
 // DTO
 
 interface Request {
@@ -23,7 +25,7 @@ class CreateTransactionService {
     const { total } = await transactionsRepository.getBalance(user_id);
 
     if (type === 'outcome' && value > Number(total)) {
-      throw Error('Your balance is insufficient');
+      throw new AppError('Your balance is insufficient');
     }
 
     const transaction = transactionsRepository.create({
