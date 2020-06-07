@@ -26,23 +26,19 @@ transactionRouter.get('/', async (request, response) => {
 });
 
 transactionRouter.post('/', async (request, response) => {
-  try {
-    const { id } = request.user;
+  const { id } = request.user;
 
-    const { title, value, type } = request.body;
+  const { title, value, type } = request.body;
 
-    const createTransaction = new CreateTransactionService();
+  const createTransaction = new CreateTransactionService();
 
-    const transaction = await createTransaction.execute({
-      title,
-      value,
-      type,
-      user_id: id,
-    });
-    return response.json(transaction);
-  } catch (err) {
-    return response.status(400).json({ error: err.message });
-  }
+  const transaction = await createTransaction.execute({
+    title,
+    value,
+    type,
+    user_id: id,
+  });
+  return response.json(transaction);
 });
 
 export default transactionRouter;
